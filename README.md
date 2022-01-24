@@ -1,0 +1,2 @@
+# KingOfWeapon
+兵王
