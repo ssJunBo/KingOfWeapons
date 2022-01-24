@@ -1,0 +1,34 @@
+ManifestFileVersion: 0
+CRC: 4248285302
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: abc354c08d70ead10a3c86bfba9920f9
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 90a99b981838ca74c9abb3e5515d58c4
+HashAppended: 0
+ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 21
+  Script: {instanceID: 0}
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 48
+  Script: {instanceID: 0}
+- Class: 96
+  Script: {instanceID: 0}
+- Class: 114
+  Script: {fileID: 11500000, guid: d1d65b8e176f8cd4280f45171a1092ea, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+- Class: 198
+  Script: {instanceID: 0}
+- Class: 199
+  Script: {instanceID: 0}
+- Class: 224
+  Script: {instanceID: 0}
+Assets:
+- Assets/GameData/Prefabs/Effect/Particle1.prefab
+Dependencies: []

@@ -1,0 +1,26 @@
+ManifestFileVersion: 0
+CRC: 1447497295
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 94001526f131b1b78b3753fa8440f2eb
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: ea5a42e0fd8ea905efa7aa926a3b8944
+HashAppended: 0
+ClassTypes:
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 213
+  Script: {instanceID: 0}
+Assets:
+- Assets/GameData/UGUI/achievement.png
+- Assets/GameData/UGUI/go.png
+- Assets/GameData/UGUI/test/1.jpg
+- Assets/GameData/UGUI/ok.png
+- Assets/GameData/UGUI/test/test3.png
+- Assets/GameData/UGUI/menu.png
+- Assets/GameData/UGUI/pause.png
+- Assets/GameData/UGUI/test/test2.png
+- Assets/GameData/UGUI/test/test1.png
+Dependencies: []
