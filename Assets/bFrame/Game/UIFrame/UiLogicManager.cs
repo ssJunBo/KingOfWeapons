@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using bFrame.Game.UIFrame.Base;
-using NUnit.Framework;
 
 namespace bFrame.Game.UIFrame
 {

@@ -7,12 +7,6 @@ namespace bFrame.Game.UIFrame.Base
 {
     public class UiLogicBase
     {
-        public enum EUiWindowLevel
-        {
-            EUiWindowLevelMainUi = 1, //常驻主窗口，                例如：摇杆，技能
-            EUiWindowLevelLoading = 1400, //Loading为最高层级
-        }
-
         protected enum UiResourceType
         {
             EUi, //2D ngui
@@ -25,7 +19,7 @@ namespace bFrame.Game.UIFrame.Base
             public bool BIsFromResources = false; //是否是Resource文件夹加载
             public bool BNeedLoad = true;
 
-            public Object ResObj { get; set; } = null;
+            public Object ResObj { get; set; }
         }
 
         public delegate void DelegateClose();
@@ -79,9 +73,6 @@ namespace bFrame.Game.UIFrame.Base
             LtNeedResources.Add(info);
         }
 
-
-        public BindUi Bind { get; }
-
         public void DoOpen()
         {
             #region ---解析传入参数 暂时支持两个int类型
@@ -114,17 +105,23 @@ namespace bFrame.Game.UIFrame.Base
             _beforeOpen = false;
             _mBShowing = true;
 
-            MessageDispatcher.Instance.DispatchMessage(EDispatchMsg.UiOpen, Bind);
+            //MessageDispatcher.Instance.DispatchMessage(EDispatchMsg.UiOpen, Bind);
             foreach (var res in LtNeedResources.Where(res => res.ResObj == null))
             {
                 res.BNeedLoad = true;
-//                ResourcesManager.Instance.LoadResource(res.StrResourcePath);
+                ResourcesManager.Instance.LoadResource(res.StrResourcePath, OnLoaded);
             }
         }
 
         public virtual EUiForType UiType()
         {
             return EUiForType.UiNone;
+        }
+
+        private void OnLoaded(string path, Object obj)
+        {
+            var item = LtNeedResources.Find(uiResourcesInfo => uiResourcesInfo.StrResourcePath == path);
+            item.ResObj = obj;
         }
     }
 }

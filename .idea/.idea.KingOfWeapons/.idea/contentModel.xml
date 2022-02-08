@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ContentModelStore">
     <e p="C:\Project\KingOfWeapons" t="IncludeRecursive">
@@ -217,7 +217,7 @@
                 <e p="TalkItem.cs" t="Include" />
               </e>
               <e p="Window" t="Include">
-                <e p="Chapter.cs" t="Include" />
+                <e p="ChapterDesigner.cs" t="Include" />
                 <e p="Loading.cs" t="Include" />
                 <e p="Menu.cs" t="Include" />
                 <e p="Start.cs" t="Include" />

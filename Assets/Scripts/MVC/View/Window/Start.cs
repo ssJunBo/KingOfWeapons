@@ -2,6 +2,7 @@
 using bFrame.Game.UIFrame;
 using bFrame.Game.UIFrame.Base;
 using MVC.Controller;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,7 +13,7 @@ namespace MVC.View.Window
         #region UI挂点
 
         [SerializeField] private Button startBtn;
-        [SerializeField] private GameObject beginTe;
+        [SerializeField] private CanvasGroup canvasGroup;
 
         #endregion
 
@@ -21,12 +22,13 @@ namespace MVC.View.Window
             base.Init();
 
             //点击开始渐隐渐显效果
-            Tools.PingpongTxt(beginTe.gameObject, 1, 0, 1);
+            Tools.PingPongAnim(canvasGroup);
             startBtn.onClick.AddListener(GoMenuScene);
         }
 
         private void GoMenuScene()
         {
+            Debug.Log("按钮点击执行");
             UiLogic.Close();
         }
     }

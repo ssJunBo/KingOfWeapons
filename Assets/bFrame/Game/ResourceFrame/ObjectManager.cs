@@ -10,28 +10,24 @@ namespace bFrame.Game.ResourceFrame
     public class ObjectManager : Singleton<ObjectManager>
     {
         //对象池节点
-        public Transform RecyclePoolTrs;
-        //场景节点
-        public Transform SceneTrs;
+        private Transform _recyclePoolTrs;
         //对象池
-        private Dictionary<string, List<ResourceObj>> _mObjectPoolDic = new Dictionary<string, List<ResourceObj>>();
+        private readonly Dictionary<string, List<ResourceObj>> _mObjectPoolDic = new Dictionary<string, List<ResourceObj>>();
         //暂存ResObj的Dic
-        private Dictionary<int, ResourceObj> _mResourceObjDic = new Dictionary<int, ResourceObj>();
+        private readonly Dictionary<int, ResourceObj> resourceObjDic = new Dictionary<int, ResourceObj>();
         //ResourceObj的类对象池
         private ClassObjectPool<ResourceObj> _mResourceObjClassPool = null;
         //根据异步的guid储存ResourceObj，来判断是都正在异步加载
-        private Dictionary<long, ResourceObj> _mAsyncResObjs = new Dictionary<long, ResourceObj>();
+        private readonly Dictionary<long, ResourceObj> _mAsyncResObjs = new Dictionary<long, ResourceObj>();
 
         /// <summary>
         /// 初始化
         /// </summary>
         /// <param name="recycleTrs">回收节点</param>
-        /// <param name="sceneTrs">场景默认节点</param>
-        public void Init(Transform recycleTrs, Transform sceneTrs)
+        public void Init(Transform recycleTrs)
         {
             _mResourceObjClassPool = GetOrCreateClassPool<ResourceObj>(1000);
-            RecyclePoolTrs = recycleTrs;
-            SceneTrs = sceneTrs;
+            _recyclePoolTrs = recycleTrs;
         }
 
         /// <summary>
@@ -46,10 +42,10 @@ namespace bFrame.Game.ResourceFrame
                 for (int i = st.Count - 1; i >= 0; i--)
                 {
                     ResourceObj resObj = st[i];
-                    if (!ReferenceEquals(resObj.MCloneObj, null) && resObj.MbClear)
+                    if (!ReferenceEquals(resObj.CloneObj, null) && resObj.IsClear)
                     {
-                        Object.Destroy(resObj.MCloneObj);
-                        _mResourceObjDic.Remove(resObj.MCloneObj.GetInstanceID());
+                        Object.Destroy(resObj.CloneObj);
+                        resourceObjDic.Remove(resObj.CloneObj.GetInstanceID());
                         resObj.Reset();
                         _mResourceObjClassPool.Recycle(resObj);
                         st.Remove(resObj);
@@ -76,26 +72,26 @@ namespace bFrame.Game.ResourceFrame
         /// <param name="path"></param>
         public void ClearPoolObject(string path)
         {
-            if (!_mObjectPoolDic.TryGetValue(path, out var st)||st==null)
+            if (!_mObjectPoolDic.TryGetValue(path, out var st) || st == null)
             {
                 return;
             }
-            
-            for (int i = st.Count-1; i>=0 ; i--)
+
+            for (int i = st.Count - 1; i >= 0; i--)
             {
                 ResourceObj resObj = st[i];
-                if (resObj.MbClear)
+                if (resObj.IsClear)
                 {
                     st.Remove(resObj);
-                    int tempID = resObj.MCloneObj.GetInstanceID();
-                    Object.Destroy(resObj.MCloneObj);
+                    int tempId = resObj.CloneObj.GetInstanceID();
+                    Object.Destroy(resObj.CloneObj);
                     resObj.Reset();
-                    _mResourceObjDic.Remove(tempID);
+                    resourceObjDic.Remove(tempId);
                     _mResourceObjClassPool.Recycle(resObj);
                 }
             }
-            
-            if (st.Count<=0)
+
+            if (st.Count <= 0)
             {
                 _mObjectPoolDic.Remove(path);
             }
@@ -104,7 +100,6 @@ namespace bFrame.Game.ResourceFrame
         /// <summary>
         /// 从对象池取对象
         /// </summary>
-        /// <param name="crc"></param>
         /// <returns></returns>
         private ResourceObj GetObjectFromPool(string path)
         {
@@ -113,10 +108,11 @@ namespace bFrame.Game.ResourceFrame
                 ResourcesManager.Instance.IncreaseResourceRef(path);
                 ResourceObj resObj = st[0];
                 st.RemoveAt(0);
-                GameObject obj = resObj.MCloneObj;
+                GameObject obj = resObj.CloneObj as GameObject;
+                
                 if (!ReferenceEquals(obj, null))
                 {
-                    resObj.MAlready = false;
+                    resObj.Already = false;
 #if UNITY_EDITOR
                     if (obj.name.EndsWith("(Recycle)"))
                     {
@@ -129,29 +125,6 @@ namespace bFrame.Game.ResourceFrame
             return null;
         }
 
-        /// <summary>
-        /// 取消异步加载
-        /// </summary>
-        /// <param name="guid"></param>
-        public void CancelLoad(long guid)
-        {
-            if (_mAsyncResObjs.TryGetValue(guid, out var resObj) && ResourcesManager.Instance.CancelAsyncLoad(resObj))
-            {
-                _mAsyncResObjs.Remove(guid);
-                resObj.Reset();
-                _mResourceObjClassPool.Recycle(resObj);
-            }
-        }
-
-        /// <summary>
-        /// 是否正在异步加载
-        /// </summary>
-        /// <param name="guid"></param>
-        /// <returns></returns>
-        public bool IsAsyncLoading(long guid)
-        {
-            return _mAsyncResObjs[guid] != null;
-        }
 
         /// <summary>
         /// 对象是否是对象池创建
@@ -159,33 +132,9 @@ namespace bFrame.Game.ResourceFrame
         /// <returns></returns>
         public bool IsObjectManagerCreate(GameObject obj)
         {
-            ResourceObj resObj = _mResourceObjDic[obj.GetInstanceID()];
-            return resObj != null;
+            return resourceObjDic[obj.GetInstanceID()] != null;
         }
-
-        /// <summary>
-        /// 预加载GameObject
-        /// </summary>
-        /// <param name="path">路径</param>
-        /// <param name="count">预加载个数</param>
-        /// <param name="clear">跳场景是否清楚</param>
-        public void PreLoadGameObject(string path, int count = 1, bool clear = false)
-        {
-            List<GameObject> tempGameObjectList = new List<GameObject>();
-            for (int i = 0; i < count; i++)
-            {
-                GameObject obj = SpwanObjFromPool(path, false, bClear: clear);
-                tempGameObjectList.Add(obj);
-            }
-
-            for (int i = 0; i < count; i++)
-            {
-                GameObject obj = tempGameObjectList[i];
-                ReleaseObject(obj);
-                obj = null;
-            }
-            tempGameObjectList.Clear();
-        }
+        
 
         /// <summary>
         /// 对象池中取出obj，没有就新例化一个 同步加载
@@ -193,7 +142,7 @@ namespace bFrame.Game.ResourceFrame
         /// <param name="path">资源路径</param>
         /// <param name="setSceneObj">是否设置到场景对象池管理位置</param>
         /// <param name="bClear"></param>
-        /// <param name="targetTransform">实例化到此tranform下</param>
+        /// <param name="targetTransform">实例化到此transform下</param>
         /// <returns></returns>
         public GameObject SpwanObjFromPool(string path, bool setSceneObj = false, bool bClear = true,Transform targetTransform=null)
         {
@@ -201,101 +150,53 @@ namespace bFrame.Game.ResourceFrame
             if (resourceObj == null)
             {
                 resourceObj = _mResourceObjClassPool.Spawn(true);
-                resourceObj.MbClear = bClear;
+                resourceObj.IsClear = bClear;
                 //ResourceManager提供加载方法
-                resourceObj = ResourcesManager.Instance.LoadResource(path, resourceObj);
+//                resourceObj = ResourcesManager.Instance.LoadResource(path, resourceObj);
 
-                if (resourceObj.MResInfo.MObj != null)
+                if (resourceObj.resInfo.Obj != null)
                 {
-                    resourceObj.MCloneObj = Object.Instantiate(resourceObj.MResInfo.MObj) as GameObject;
+                    resourceObj.CloneObj = Object.Instantiate(resourceObj.resInfo.Obj) as GameObject;
                 }
             }
             if (targetTransform!=null)
             {
-                if (resourceObj.MCloneObj != null) 
-                    resourceObj.MCloneObj.transform.SetParent(targetTransform, true);
+                if (resourceObj.CloneObj != null) 
+                    resourceObj.CloneObj.transform.SetParent(targetTransform, true);
             }
             else
             {
                 if (setSceneObj)
                 {
-                    if (resourceObj.MCloneObj != null) 
-                        resourceObj.MCloneObj.transform.SetParent(SceneTrs, false);
+                    if (resourceObj.CloneObj != null) 
+                        resourceObj.CloneObj.transform.SetParent(_recyclePoolTrs, false);
                 }
             }
 
-            if (resourceObj.MCloneObj != null)
+            if (resourceObj.CloneObj != null)
             {
-                int tempId = resourceObj.MCloneObj.GetInstanceID();
-                if (!_mResourceObjDic.ContainsKey(tempId))
-                {
-                    _mResourceObjDic.Add(tempId, resourceObj);
-                }
+//                int tempId = resourceObj.CloneObj.GetInstanceID();
+//                if (!_mResourceObjDic.ContainsKey(tempId))
+//                {
+//                    _mResourceObjDic.Add(tempId, resourceObj);
+//                }
             }
 
-            return resourceObj.MCloneObj;
+            return resourceObj.CloneObj;
         }
 
-        /// <summary>
-        /// 异步对象加载
-        /// </summary>
-        /// <param name="path"></param>
-        /// <param name="dealFinish"></param>
-        /// <param name="priority"></param>
-        /// <param name="setSceneObject"></param>
-        /// <param name="param1"></param>
-        /// <param name="param2"></param>
-        /// <param name="param3"></param>
-        /// <param name="bClear"></param>
-        public long InstantiateObjectAsync(string path, OnAsyncObjFinish dealFinish, ELoadResPriority priority, bool setSceneObject = false, object param1 = null, object param2 = null, object param3 = null, bool bClear = true)
-        {
-            if (string.IsNullOrEmpty(path))
-            {
-                return 0;
-            }
-            ResourceObj resObj = GetObjectFromPool(path);
-            if (resObj != null)
-            {
-                if (setSceneObject)
-                {
-                    resObj.MCloneObj.transform.SetParent(SceneTrs, false);
-                }
-
-                dealFinish?.Invoke(path, resObj.MCloneObj, param1, param2, param3);
-
-                return resObj.MGuid;
-            }
-
-            long guid = ResourcesManager.Instance.CreateGuid();
-            _mAsyncResObjs.Add(guid, resObj);
-
-            resObj = _mResourceObjClassPool.Spawn(true);
-            resObj.MSetSceneParent = setSceneObject;
-            resObj.MbClear = bClear;
-            resObj.MDealFinis = dealFinish;
-            resObj.MParam1 = param1;
-            resObj.MParam2 = param2;
-            resObj.MParam3 = param3;
-
-            //调用ResourceManager的异步加载接口
-            ResourcesManager.Instance.AsyncLoadResource(path, resObj, OnLoadResourceObjFinish, priority);
-            return guid;
-        }
 
         /// <summary>
         /// 资源加载完成回调
         /// </summary>
         /// <param name="path">路径</param>
         /// <param name="resObj">中间类</param>
-        /// <param name="param1">参数1</param>
-        /// <param name="param2">参数2</param>
-        /// <param name="param3">参数3</param>
-        private void OnLoadResourceObjFinish(string path, ResourceObj resObj, object param1 = null, object param2 = null, object param3 = null)
+        private void OnLoadResourceObjFinish(string path, ResourceObj resObj)
         {
             if (resObj == null)
                 return;
 
-            if (resObj.MResInfo.MObj == null)
+            if (resObj.resInfo.Obj == null)
             {
 #if UNITY_EDITOR
                 Debug.LogError("异步资源加载的资源为空：" + path);
@@ -303,32 +204,13 @@ namespace bFrame.Game.ResourceFrame
             }
             else
             {
-                resObj.MCloneObj = Object.Instantiate(resObj.MResInfo.MObj) as GameObject;
+                resObj.CloneObj = Object.Instantiate(resObj.resInfo.Obj) as GameObject;
             }
 
             //加载完成就从正在加载的异步中移除
-            if (_mAsyncResObjs.ContainsKey(resObj.MGuid))
+            if (_mAsyncResObjs.ContainsKey(resObj.Guid))
             {
-                _mAsyncResObjs.Remove(resObj.MGuid);
-            }
-
-            if (resObj.MCloneObj != null && resObj.MSetSceneParent)
-            {
-                resObj.MCloneObj.transform.SetParent(SceneTrs, false);
-            }
-
-            if (resObj.MDealFinis != null)
-            {
-                if (resObj.MCloneObj != null)
-                {
-                    int tempId = resObj.MCloneObj.GetInstanceID();
-                    if (!_mResourceObjDic.ContainsKey(tempId))
-                    {
-                        _mResourceObjDic.Add(tempId, resObj);
-                    }
-                }
-
-                resObj.MDealFinis(path, resObj.MCloneObj, resObj.MParam1, resObj.MParam2, resObj.MParam3);
+                _mAsyncResObjs.Remove(resObj.Guid);
             }
         }
 
@@ -348,7 +230,7 @@ namespace bFrame.Game.ResourceFrame
             }
 
             int tempId = obj.GetInstanceID();
-            if (!_mResourceObjDic.TryGetValue(tempId, out var resObj))
+            if (!resourceObjDic.TryGetValue(tempId, out var resObj))
             {
                 Debug.LogError(obj.name + " 对象不是ObjectManager创建的");
                 return;
@@ -359,7 +241,7 @@ namespace bFrame.Game.ResourceFrame
                 Debug.LogError("缓存的ResourceObj为空！");
             }
 
-            if (resObj != null && resObj.MAlready)
+            if (resObj != null && resObj.Already)
             {
                 Debug.LogError("该对象已经放回对象池，检查自己是否清空引用！");
                 return;
@@ -369,7 +251,7 @@ namespace bFrame.Game.ResourceFrame
 #endif
             if (maxCacheCount == 0)
             {
-                _mResourceObjDic.Remove(tempId);
+                resourceObjDic.Remove(tempId);
                 ResourcesManager.Instance.ReleaseResource(resObj, destroyCache);
                 if (resObj != null)
                 {
@@ -388,28 +270,28 @@ namespace bFrame.Game.ResourceFrame
                         _mObjectPoolDic.Add(resObj.Path, st);
                     }
 
-                    if (resObj.MCloneObj)
+                    if (resObj.CloneObj)
                     {
                         if (recycleParent)
                         {
-                            resObj.MCloneObj.transform.SetParent(RecyclePoolTrs);
+//                            resObj.CloneObj.transform.SetParent(_recyclePoolTrs);
                         }
                         else
                         {
-                            resObj.MCloneObj.SetActive(false);
+//                            resObj.CloneObj.SetActive(false);
                         }
                     }
 
                     if (maxCacheCount <= 0 || st.Count < maxCacheCount)
                     {
                         st.Add(resObj);
-                        resObj.MAlready = true;
+                        resObj.Already = true;
                         //ResourceManger做一个引用计数 
-                        ResourcesManager.Instance.DecreaseResourceRef(resObj);
+//                        ResourcesManager.Instance.DecreaseResourceRef(resObj);
                     }
                     else
                     {
-                        _mResourceObjDic.Remove(tempId);
+                        resourceObjDic.Remove(tempId);
                         ResourcesManager.Instance.ReleaseResource(resObj, destroyCache);
                         resObj.Reset();
                         _mResourceObjClassPool.Recycle(resObj);
@@ -425,9 +307,6 @@ namespace bFrame.Game.ResourceFrame
         /// <summary>
         /// 创建类对象池，创建完成后外面可以保存ClassObjectPool<T>，然后调用spwan和recycle来创建和回收类对象
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="maxCount"></param>
-        /// <returns></returns>
         public ClassObjectPool<T> GetOrCreateClassPool<T>(int maxCount) where T : class, new()
         {
             Type type = typeof(T);

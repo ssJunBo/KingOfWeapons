@@ -251,7 +251,7 @@ namespace bFrame.Game.ResourceFrame
         /// 删除某个节点
         /// </summary>
         /// <param name="t"></param>
-        private void Remove(T t)
+        public void Remove(T t)
         {
             if (!_mFindMap.TryGetValue(t, out var node) || node == null)
             {

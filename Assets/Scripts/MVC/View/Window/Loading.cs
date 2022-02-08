@@ -45,6 +45,5 @@ namespace MVC.View.Window
             }
             GameManager.Instance.UiManager.CloseWnd(ConStr._LoadingPanel);
         }
-
     }
 }

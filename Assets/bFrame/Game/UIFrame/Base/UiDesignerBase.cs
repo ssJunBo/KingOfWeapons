@@ -15,7 +15,7 @@ namespace bFrame.Game.UIFrame.Base
         //引用GameObject
         public GameObject GameObject { get; set; }
 
-        protected readonly UiLogicBase UiLogic;
+        protected UiLogicBase UiLogic;
         //引用Transform
         public Transform Transform { get; set; }
 
@@ -28,11 +28,11 @@ namespace bFrame.Game.UIFrame.Base
         //所有的Toggle
         private readonly List<Toggle> _mAllToggle = new List<Toggle>();
 
-//        public UiDesignerBase(UiLogicBase uiLogic)
+        public void SetLogic(UiLogicBase uiLogic)
         {
             UiLogic = uiLogic;
         }
-
+        
         public virtual bool OnMessage(EuiMsgId msgId, params object[] paraList)
         {
             return true;

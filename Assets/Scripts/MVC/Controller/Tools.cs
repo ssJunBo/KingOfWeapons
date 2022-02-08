@@ -65,15 +65,10 @@ namespace MVC.Controller
         /// <summary>
         /// 渐隐渐现
         /// </summary>
-        /// <param name="go"></param>
-        /// <param name="fromVal"></param>
-        /// <param name="toVal"></param>
-        /// <param name="duration"></param>
-        public static void PingpongTxt(GameObject go, float fromVal, float toVal, float duration)
+        public static void PingPongAnim(CanvasGroup go, float fromVal = 1f, float toVal = 0f, float duration = 1f)
         {
-            Text te = go.GetComponent<Text>();
-            if (te == null) return;
-            te.DOFade(toVal, duration).onComplete = () => { PingpongTxt(go, toVal, fromVal, duration); };
+            go.DOFade(toVal, duration).onComplete =
+                () => { PingPongAnim(go, toVal, fromVal, duration); };
         }
 
         #endregion

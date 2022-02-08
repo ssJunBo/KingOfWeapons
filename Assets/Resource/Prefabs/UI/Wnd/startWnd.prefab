@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 7974490051768480652}
   - component: {fileID: 7974490051768480653}
   - component: {fileID: 7974490051768480654}
+  - component: {fileID: 4477686295538157835}
   m_Layer: 5
   m_Name: start_Te
   m_TagString: Untagged
@@ -79,6 +80,18 @@ MonoBehaviour:
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: "\u70B9\u51FB\u5F00\u59CB"
+--- !u!225 &4477686295538157835
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7974490051768480655}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 0
+  m_BlocksRaycasts: 0
+  m_IgnoreParentGroups: 0
 --- !u!1 &7974490051801473219
 GameObject:
   m_ObjectHideFlags: 0
@@ -290,3 +303,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 31a321bdda14feb40972e449b89aaa0f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  startBtn: {fileID: 7974490053415315644}
+  canvasGroup: {fileID: 4477686295538157835}

@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 namespace MVC.View.Window
 {
-    public class Chapter : UiDesignerBase
+    public class ChapterDesigner : UiDesignerBase
     {
         [SerializeField,Header("返回按钮")] private Button backBtn;
         [SerializeField] private Text titleTe;
@@ -34,10 +34,6 @@ namespace MVC.View.Window
             }
 
             GameManager.Instance.UiManager.HideWnd(ConStr._ChapterPanel);
-        }
-
-        public Chapter(UiLogicBase uiLogic) : base(uiLogic)
-        {
         }
     }
 }

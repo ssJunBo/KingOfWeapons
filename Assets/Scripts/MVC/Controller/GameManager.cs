@@ -9,12 +9,10 @@ namespace MVC.Controller
     public class GameManager : MonoSingleton<GameManager>
     {
         [SerializeField] private bool loadFromAssetBundle;
-
         
         #region Manager 属性
         public UiManager UiManager { get; private set; }
-        public AudioManager AudioManager { get; private set; }
-        public SceneManager sceneManager { get; private set; }
+
         #endregion
 
         private void InitManager()
@@ -23,8 +21,7 @@ namespace MVC.Controller
                 transform.Find("UICamera").GetComponent<Camera>(),
                 transform.Find("EventSystem").GetComponent<EventSystem>());
 
-            sceneManager = new SceneManager(this);
-            AudioManager = new AudioManager();
+            new SceneManager(this);
         }
 
         protected override void Awake()
@@ -38,7 +35,7 @@ namespace MVC.Controller
 //            if (ResourceManager.Instance.MLoadFromAssetBundle)
 //                AssetBundleManager.Instance.LoadAssetBundleConfig();
         
-            ObjectManager.Instance.Init(transform.Find("RecyclePoolTrs"), transform.Find("SceneTrs"));
+            ObjectManager.Instance.Init(transform.Find("RecyclePoolTrs"));
         }
 
         private void Start()
@@ -48,8 +45,8 @@ namespace MVC.Controller
             //用到的窗口要进行注册
             RegisterUi();
             //预加载几个提示框
-            ObjectManager.Instance.PreLoadGameObject(ConStr.tipsItem_Path, 2);
-            ObjectManager.Instance.PreLoadGameObject(ConStr.talkItem_Path, 5);
+//            ObjectManager.Instance.PreLoadGameObject(ConStr.tipsItem_Path, 2);
+//            ObjectManager.Instance.PreLoadGameObject(ConStr.talkItem_Path, 5);
         }
 
         private void Update()
@@ -65,7 +62,7 @@ namespace MVC.Controller
         {
             UiManager.Register<Menu>(ConStr._MenuPanel);
             UiManager.Register<Loading>(ConStr._LoadingPanel);
-            UiManager.Register<Chapter>(ConStr._ChapterPanel);
+            UiManager.Register<ChapterDesigner>(ConStr._ChapterPanel);
             UiManager.Register<Talk>(ConStr._TalkPanel);
         }
 
