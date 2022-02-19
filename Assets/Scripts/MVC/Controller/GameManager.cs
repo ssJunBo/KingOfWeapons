@@ -1,33 +1,41 @@
 ﻿using bFrame.Game.ResourceFrame;
-using bFrame.Game.UIFrame;
-using MVC.View.Window;
+using MVC.Model;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 namespace MVC.Controller
 {
     public class GameManager : MonoSingleton<GameManager>
     {
         [SerializeField] private bool loadFromAssetBundle;
+
+        [Header("普通 Designer 放在此节点下"),Space]public Transform Ui2DTransform;
+
+        [Header("对象池回收节点"),Space]
+        public Transform RecyclePoolTrs;
+
         
-        #region Manager 属性
-        public UiManager UiManager { get; private set; }
+        #region moudle play
+        private CMoudlePlay mMoudlePlay;
 
-        #endregion
-
-        private void InitManager()
+        public CMoudlePlay MoudlePlay
         {
-            UiManager = new UiManager(transform.Find("UIRoot_2d") as RectTransform,
-                transform.Find("UICamera").GetComponent<Camera>(),
-                transform.Find("EventSystem").GetComponent<EventSystem>());
-
-            new SceneManager(this);
+            get
+            {
+                if (mMoudlePlay==null)
+                {
+                    mMoudlePlay=new CMoudlePlay();
+                }
+                return mMoudlePlay;
+            }
         }
+        #endregion
 
         protected override void Awake()
         {
             base.Awake();
+           
             DontDestroyOnLoad(gameObject);
+            
             InitManager();
 
             //从ab包加载就要先加载配置表
@@ -35,35 +43,18 @@ namespace MVC.Controller
 //            if (ResourceManager.Instance.MLoadFromAssetBundle)
 //                AssetBundleManager.Instance.LoadAssetBundleConfig();
         
-            ObjectManager.Instance.Init(transform.Find("RecyclePoolTrs"));
         }
 
         private void Start()
         {
             LoadConfig();
 
-            //用到的窗口要进行注册
-            RegisterUi();
-            //预加载几个提示框
-//            ObjectManager.Instance.PreLoadGameObject(ConStr.tipsItem_Path, 2);
-//            ObjectManager.Instance.PreLoadGameObject(ConStr.talkItem_Path, 5);
+            MoudlePlay.UiStartWndLogic.Open();
         }
-
-        private void Update()
+        
+        private void InitManager()
         {
-            if (Input.GetKeyDown(KeyCode.D))
-            {
-                ShowTips("你好啊全世界 ！" + Random.Range(0, 5).ToString());
-            }
-        }
-
-        //注册ui窗口
-        private void RegisterUi()
-        {
-            UiManager.Register<Menu>(ConStr._MenuPanel);
-            UiManager.Register<Loading>(ConStr._LoadingPanel);
-            UiManager.Register<ChapterDesigner>(ConStr._ChapterPanel);
-            UiManager.Register<Talk>(ConStr._TalkPanel);
+          
         }
 
         /// <summary>
@@ -74,16 +65,7 @@ namespace MVC.Controller
             //ConfigerManager.Instance.LoadData<BuffData>(CFG.TABLE_BUFF);
             //ConfigerManager.Instance.LoadData<MonsterData>(CFG.TABLE_MONSTER);
         }
-
-        /// <summary>
-        /// 提示展示
-        /// </summary>
-        /// <param name="strContent"></param>
-        public void ShowTips(string strContent)
-        {
-            GameObject tipObj = ObjectManager.Instance.SpwanObjFromPool(ConStr.tipsItem_Path, targetTransform: UiManager.MWndRoot);
-            tipObj.GetComponent<TipsItem>().content.text = strContent;
-        }
+        
 
         private void OnApplicationQuit()
         {

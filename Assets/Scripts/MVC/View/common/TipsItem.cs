@@ -10,7 +10,7 @@ public class TipsItem : BaseItem
     {
         Tools.TimeCallback(this, 1f, () =>
         {
-            ObjectManager.Instance.ReleaseObject(gameObject);
+            
         });
         transform.DOLocalMoveY(transform.localPosition.y + 100, 0.5f);
     }

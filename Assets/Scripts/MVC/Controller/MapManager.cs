@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Collections;
 using bFrame.Game.ResourceFrame;
-using MVC.Controller;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+/// <summary>
+/// 场景异步加载
+/// </summary>
 public class SceneManager
 {
     //加载场景完成回调
     public Action LoadSceneOverCallBack;
+
     //加载场景开始回调
     public Action LoadSceneEnterCallBack;
 
@@ -36,7 +39,9 @@ public class SceneManager
     {
         LoadingProgress = 0;
         m_Mono.StartCoroutine(LoadSceneAsync(name));
-        GameManager.Instance.UiManager.PopUpWnd(ConStr._LoadingPanel);
+        
+        //TODO 
+        //GameManager.Instance.UiManager.PopUpWnd(ConStr._LoadingPanel);
     }
 
     /// <summary>
@@ -53,11 +58,13 @@ public class SceneManager
         LoadSceneEnterCallBack?.Invoke();
         ClearCache();
         AlreadyLoadScene = false;
-        AsyncOperation unLoadScene = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(ConStr.EMPTYSCENE, LoadSceneMode.Single);
+        AsyncOperation unLoadScene =
+            UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(ConStr.EMPTYSCENE, LoadSceneMode.Single);
         while (unLoadScene != null && !unLoadScene.isDone)
         {
             yield return new WaitForEndOfFrame();
         }
+
         LoadingProgress = 0;
         int targetProgress = 0;
         AsyncOperation asyncScene = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(name);
@@ -66,7 +73,7 @@ public class SceneManager
             asyncScene.allowSceneActivation = false;
             while (asyncScene.progress < 0.9f)
             {
-                targetProgress = (int)asyncScene.progress * 100;
+                targetProgress = (int) asyncScene.progress * 100;
                 yield return new WaitForEndOfFrame();
                 //平滑过渡
                 while (LoadingProgress < targetProgress)
@@ -75,6 +82,7 @@ public class SceneManager
                     yield return new WaitForEndOfFrame();
                 }
             }
+
             CurrentMapName = name;
             SetSceneSetting(name);
             //自行加载剩余的10%
@@ -84,6 +92,7 @@ public class SceneManager
                 ++LoadingProgress;
                 yield return new WaitForEndOfFrame();
             }
+
             LoadingProgress = 0;
             asyncScene.allowSceneActivation = true;
             AlreadyLoadScene = true;
@@ -99,7 +108,6 @@ public class SceneManager
     /// </summary>
     private void ClearCache()
     {
-        ObjectManager.Instance.ClearCache();
         ResourcesManager.Instance.ClearCache();
     }
 

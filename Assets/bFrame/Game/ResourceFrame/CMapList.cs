@@ -1,6 +1,6 @@
 ﻿
 //双向链表结构节点
-
+using System;
 using System.Collections.Generic;
 
 namespace bFrame.Game.ResourceFrame
@@ -22,6 +22,7 @@ namespace bFrame.Game.ResourceFrame
     /// <typeparam name="T"></typeparam>
     public class DoubleLinkedList<T> where T : class, new()
     {
+
         //表头
         public DoubleLinkedListNode<T> Head = null;
 
@@ -30,7 +31,7 @@ namespace bFrame.Game.ResourceFrame
 
         //双向链表结构类对象池
         private readonly ClassObjectPool<DoubleLinkedListNode<T>> _mDoubleLinkNodePool =
-            ObjectManager.Instance.GetOrCreateClassPool<DoubleLinkedListNode<T>>(500);
+            PoolManager.Instance.GetOrCreateClassPool<DoubleLinkedListNode<T>>(500);
 
         //个数
         private int Count { get; set; } = 0;
@@ -306,6 +307,7 @@ namespace bFrame.Game.ResourceFrame
             _mDLink.MoveToHead(node);
             return true;
         }
+        
+       
     }
-
 }

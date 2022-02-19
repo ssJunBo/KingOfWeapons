@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using bFrame.Game.ResourceFrame;
 using UnityEngine;
 using UnityEngine.UI;
+using Object = UnityEngine.Object;
 
 namespace bFrame.Game.UIFrame.Base
 {
@@ -43,6 +45,11 @@ namespace bFrame.Game.UIFrame.Base
         }
 
         public virtual void ShowFinished()
+        {
+            
+        }
+
+        public virtual void OnUpdate()
         {
             
         }

@@ -2,6 +2,8 @@
 using bFrame.Game.UIFrame;
 using bFrame.Game.UIFrame.Base;
 using MVC.Controller;
+using MVC.Model;
+using MVC.Model.UiLogic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -17,14 +19,19 @@ namespace MVC.View.Window
 
         #endregion
 
+        private UiStartWndLogic UiStartWndLogic; 
         public override void Init()
         {
             base.Init();
 
+            UiStartWndLogic = (UiStartWndLogic)UiLogic;
+            
             //点击开始渐隐渐显效果
             Tools.PingPongAnim(canvasGroup);
+            
             startBtn.onClick.AddListener(GoMenuScene);
         }
+
 
         private void GoMenuScene()
         {

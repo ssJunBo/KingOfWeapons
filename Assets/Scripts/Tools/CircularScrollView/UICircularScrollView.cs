@@ -217,7 +217,7 @@ public class UICircularScrollView : MonoBehaviour, IBeginDragHandler, IEndDragHa
             {
                 if (m_CellInfos[i].obj != null)
                 {
-                    ObjectManager.Instance.ReleaseObject(m_CellInfos[i].obj);
+//                    ObjectManager.Instance.ReleaseObject(m_CellInfos[i].obj);
                     m_CellInfos[i].obj = null;
                 }
             }
@@ -244,7 +244,7 @@ public class UICircularScrollView : MonoBehaviour, IBeginDragHandler, IEndDragHa
 
                     if (tempCellInfo.obj == null)
                     {
-                        tempCellInfo.obj = ObjectManager.Instance.SpwanObjFromPool(ConStr.talkItem_Path, targetTransform: m_Content.transform);
+//                        tempCellInfo.obj = ObjectManager.Instance.SpwanObjFromPool(ConStr.talkItem_Path, targetTransform: m_Content.transform);
                     }
                     tempCellInfo.obj.transform.GetComponent<RectTransform>().anchoredPosition = tempCellInfo.pos;
                     //tempCellInfo.obj.name = i.ToString();
@@ -254,7 +254,7 @@ public class UICircularScrollView : MonoBehaviour, IBeginDragHandler, IEndDragHa
                 }
                 else
                 {
-                    ObjectManager.Instance.ReleaseObject(tempCellInfo.obj);
+//                    ObjectManager.Instance.ReleaseObject(tempCellInfo.obj);
                     tempCellInfo.obj = null;
                 }
                 m_CellInfos[i] = tempCellInfo;
@@ -293,8 +293,8 @@ public class UICircularScrollView : MonoBehaviour, IBeginDragHandler, IEndDragHa
             m_MinIndex = m_MinIndex == -1 ? i : m_MinIndex; //首位index
             m_MaxIndex = i; // 末尾index
 
-            //-> 取或创建 Cell
-            GameObject cell = ObjectManager.Instance.SpwanObjFromPool(ConStr.talkItem_Path, targetTransform: m_Content.transform);
+            //-> 取或创建 Cell TODO songjunbo
+            GameObject cell = null;//ObjectManager.Instance.SpwanObjFromPool(ConStr.talkItem_Path, targetTransform: m_Content.transform);
             cell.transform.GetComponent<RectTransform>().anchoredPosition = cellInfo.pos;
             //cell.gameObject.name = i.ToString();
 
@@ -426,7 +426,8 @@ public class UICircularScrollView : MonoBehaviour, IBeginDragHandler, IEndDragHa
                 //把超出范围的cell 扔进 poolsObj里
                 if (obj != null)
                 {
-                    ObjectManager.Instance.ReleaseObject(obj);
+                    //TODO songjunbo
+                    //ObjectManager.Instance.ReleaseObject(obj);
                     m_CellInfos[i].obj = null;
                 }
             }
@@ -435,7 +436,9 @@ public class UICircularScrollView : MonoBehaviour, IBeginDragHandler, IEndDragHa
                 if (obj == null)
                 {
                     //优先从 poolsObj中 取出 （poolsObj为空则返回 实例化的cell）
-                    GameObject cell = ObjectManager.Instance.SpwanObjFromPool(ConStr.talkItem_Path, targetTransform: m_Content.transform);
+                    
+                    //TODO songjunbo
+                    GameObject cell = null;//ObjectManager.Instance.SpwanObjFromPool(ConStr.talkItem_Path, targetTransform: m_Content.transform);
                     cell.transform.localPosition = pos;
                     //cell.gameObject.name = i.ToString();
                     m_CellInfos[i].obj = cell;

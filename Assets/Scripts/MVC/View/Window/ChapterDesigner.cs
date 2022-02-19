@@ -22,7 +22,7 @@ namespace MVC.View.Window
             var count = 10;
             for (var i = 0; i < count; i++)
             {
-                _itemLis.Add(ObjectManager.Instance.SpwanObjFromPool(ConStr.bookItem_Path, targetTransform: contentTrs));
+//                _itemLis.Add(ObjectManager.Instance.SpwanObjFromPool(ConStr.bookItem_Path, targetTransform: contentTrs));
             }
         }
 
@@ -30,10 +30,8 @@ namespace MVC.View.Window
         {
             foreach (var t in _itemLis)
             {
-                ObjectManager.Instance.ReleaseObject(t);
+               
             }
-
-            GameManager.Instance.UiManager.HideWnd(ConStr._ChapterPanel);
         }
     }
 }

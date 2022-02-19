@@ -58,18 +58,14 @@ namespace MVC.View.Window
 
         private void OnClickChapter()
         {
-            GameManager.Instance.UiManager.PopUpWnd(ConStr._ChapterPanel);
         }
 
         private void OnClickAchievement()
         {
-            GameManager.Instance.ShowTips("点击了成就按钮！");
         }
 
         private void OnClickNewGame()
         {
-            GameManager.Instance.UiManager.PopUpWnd(ConStr._TalkPanel);
-            GameManager.Instance.UiManager.HideWnd(ConStr._MenuPanel);
         }
 
         private void OnClickGoOn()

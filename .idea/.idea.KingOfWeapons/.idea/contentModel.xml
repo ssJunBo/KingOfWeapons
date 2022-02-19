@@ -38,8 +38,7 @@
               <e p="AssetBundleManager.cs" t="Include" />
               <e p="ClassObjectPool.cs" t="Include" />
               <e p="CMapList.cs" t="Include" />
-              <e p="CRC32.cs" t="Include" />
-              <e p="ObjectManager.cs" t="Include" />
+              <e p="PoolManager.cs" t="Include" />
               <e p="Resource.asmdef" t="Include" />
               <e p="ResourcesManager.cs" t="Include" />
             </e>
@@ -52,8 +51,6 @@
               </e>
               <e p="MessageDispatcher.cs" t="Include" />
               <e p="UiLogicManager.cs" t="Include" />
-              <e p="UIManager.asmdef" t="Include" />
-              <e p="UIManager.cs" t="Include" />
             </e>
           </e>
         </e>
@@ -177,7 +174,7 @@
             <e p="WireFormat.cs" t="Include" />
           </e>
         </e>
-        <e p="Resource" t="Include">
+        <e p="Resources" t="Include">
           <e p="Data" t="Include">
             <e p="Xml" t="Include">
               <e p="BuffData.xml" t="Include" />
@@ -206,7 +203,11 @@
               <e p="Tools.cs" t="Include" />
             </e>
             <e p="Model" t="Include">
-              <e p="UiStartWndLogic.cs" t="Include" />
+              <e p="CMoudlePlay.cs" t="Include" />
+              <e p="IMoudle.cs" t="Include" />
+              <e p="UiLogic" t="Include">
+                <e p="UiStartWndLogic.cs" t="Include" />
+              </e>
             </e>
             <e p="View" t="Include">
               <e p="common" t="Include">
@@ -253,7 +254,6 @@
       <e p="Packages" t="ExcludeRecursive" />
       <e p="Resource.csproj" t="IncludeRecursive" />
       <e p="Temp\bin" t="ExcludeRecursive" />
-      <e p="UIManager.csproj" t="IncludeRecursive" />
     </e>
     <e p="C:\Users\63405\.Rider2019.2\system\extResources" t="IncludeRecursive" />
     <e p="C:\Users\63405\.Rider2019.2\system\resharper-host\local\Transient\ReSharperHost\v192\SolutionCaches\_KingOfWeapons.1630574184.00" t="ExcludeRecursive" />

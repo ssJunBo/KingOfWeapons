@@ -40,10 +40,8 @@ namespace MVC.View.Window
             switch (_mSceneName)
             {
                 case ConStr.MENUSCENE:
-                    GameManager.Instance.UiManager.PopUpWnd(ConStr._MenuPanel);
                     break;
             }
-            GameManager.Instance.UiManager.CloseWnd(ConStr._LoadingPanel);
         }
     }
 }

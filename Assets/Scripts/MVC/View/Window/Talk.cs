@@ -50,8 +50,6 @@ namespace MVC.View.Window
 
         private void OnClickBackBtn()
         {
-            GameManager.Instance.UiManager.HideWnd(ConStr._TalkPanel);
-            GameManager.Instance.UiManager.PopUpWnd(ConStr._MenuPanel);
         }
     }
 }

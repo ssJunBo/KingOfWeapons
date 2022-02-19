@@ -39,21 +39,10 @@ namespace bFrame.Game.ResourceFrame
         public string Path;
 
         public ResourceInfo resInfo;
-        
+
         public GameObject CloneObj;
-
-        public bool IsClear;
-
-        public bool Already;
-
-        public int Guid;
-        public void Reset()
-        {
-            
-        }
     }
-
-
+    
     public class ResourcesManager : Singleton<ResourcesManager>
     {
         private long _mGuid = 0;
@@ -68,22 +57,6 @@ namespace bFrame.Game.ResourceFrame
         /// 缓存应用为零的资源列表，达到缓存最大的时 释放这个列表里面最早没用的资源
         /// </summary>
         private readonly CMapList<ResourceInfo> _mNoReferenceAssetMapList = new CMapList<ResourceInfo>();
-
-        //最长连续卡着加载资源的时间 单位微秒
-        private const long MaxLoadTime = 200000;
-
-        //最大缓存个数 中配 500 高配 1000 低配 200 复杂处理（搜索 unity3d获取内存大小）
-        private const int MaxCacheCount = 500;
-
-
-        /// <summary>
-        /// 创建唯一的GUID
-        /// </summary>
-        /// <returns></returns>
-        public long CreateGuid()
-        {
-            return _mGuid++;
-        }
 
         /// <summary>
         /// 清空缓存 一般用于跳场景
@@ -111,25 +84,23 @@ namespace bFrame.Game.ResourceFrame
         /// <param name="isFromResources"></param>
         public void LoadResource(string path, DelegateResourceLoaded onLoaded, bool isFromResources = true)
         {
-            ResourceInfo resourceItem = GetCacheResourceItem(path);
+            ResourceInfo resourceInfo = GetCacheResourceInfo(path);
 
-            if (resourceItem != null)
+            if (resourceInfo == null)
             {
-                if (resourceItem.Obj != null)
+                resourceInfo = new ResourceInfo
                 {
-                    onLoaded?.Invoke(path, resourceItem.Obj);
-                }
+                    IsFromResources = isFromResources,
+                    Path = path,
+                    Obj = Resources.Load(path)
+                };
+
+                resourceInfo.RefCount++;
+
+                _assetDic[path] = resourceInfo;
             }
 
-            resourceItem = new ResourceInfo
-            {
-                IsFromResources = isFromResources,
-                Path = path
-            };
-
-            resourceItem.RefCount++;
-
-            _assetDic[path] = resourceItem;
+            onLoaded?.Invoke(path, resourceInfo.Obj);
         }
 
         /// <summary>
@@ -137,7 +108,6 @@ namespace bFrame.Game.ResourceFrame
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="path"></param>
-        /// <returns></returns>
         public T LoadResource<T>(string path) where T : Object
         {
             if (string.IsNullOrEmpty(path))
@@ -145,7 +115,7 @@ namespace bFrame.Game.ResourceFrame
                 return null;
             }
 
-            ResourceInfo info = GetCacheResourceItem(path);
+            ResourceInfo info = GetCacheResourceInfo(path);
 
             if (info != null)
             {
@@ -290,6 +260,7 @@ namespace bFrame.Game.ResourceFrame
         /// </summary>
         private void WashOut()
         {
+            //TODO junbo
             //当大于缓存个数时进行一半释放
 //            while (_mNoReferenceAssetMapList.Size() >= MaxCacheCount)
 //            {
@@ -326,12 +297,11 @@ namespace bFrame.Game.ResourceFrame
 
             _mNoReferenceAssetMapList.Remove(info);
 
-            //清空资源对应的对象池
-            ObjectManager.Instance.ClearPoolObject(info.Path);
 
             if (info.Obj != null)
             {
                 info.Obj = null;
+
 #if UNITY_EDITOR
                 Resources.UnloadUnusedAssets();
 #endif
@@ -351,7 +321,7 @@ namespace bFrame.Game.ResourceFrame
         /// <param name="path"></param>
         /// <param name="addRefCount"></param>
         /// <returns></returns>
-        private ResourceInfo GetCacheResourceItem(string path, int addRefCount = 1)
+        private ResourceInfo GetCacheResourceInfo(string path, int addRefCount = 1)
         {
             if (_assetDic.TryGetValue(path, out var item))
             {
@@ -363,11 +333,6 @@ namespace bFrame.Game.ResourceFrame
             }
 
             return item;
-        }
-
-        public void IncreaseResourceRef(string path)
-        {
-            
         }
     }
 }

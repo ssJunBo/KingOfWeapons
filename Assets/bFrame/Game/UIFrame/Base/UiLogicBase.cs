@@ -1,127 +1,102 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using bFrame.Game.ResourceFrame;
+﻿using bFrame.Game.ResourceFrame;
+using MVC.Controller;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace bFrame.Game.UIFrame.Base
 {
     public class UiLogicBase
     {
-        protected enum UiResourceType
+        private bool IsShowing;
+
+        private bool _beforeOpen;
+
+        protected UiDesignerBase mDesigner;
+
+        private Vector3 _vector3 = new Vector3(-9999, -9999, -9999);
+
+        private string mainPath;
+
+        protected void SetPath(string path)
         {
-            EUi, //2D ngui
+            mainPath = path;
         }
-
-        protected class UiResourcesInfo
-        {
-            public UiResourceType EType = UiResourceType.EUi;
-            public string StrResourcePath;
-            public bool BIsFromResources = false; //是否是Resource文件夹加载
-            public bool BNeedLoad = true;
-
-            public Object ResObj { get; set; }
-        }
-
-        public delegate void DelegateClose();
-
-        public DelegateClose EventClose = null;
-
-        protected readonly List<UiResourcesInfo> LtNeedResources = new List<UiResourcesInfo>();
-
-        private bool _mBShowing = false;
-
-        private bool _beforeOpen = false;
-
-        private object[] Paras { get; } = null;
-
         //实际打开
-        protected virtual void Open()
+        public virtual void Open()
         {
-            if (_mBShowing || _beforeOpen)
+            if (IsShowing || _beforeOpen)
                 return;
 
             _beforeOpen = true;
+            
             UiLogicManager.Instance.AddUi(this);
         }
-
-        protected virtual void AnalysParas(int nPara1, int nPara2)
-        {
-
-        }
+        
 
         public virtual void Close()
         {
+            UiLogicManager.Instance.RemoveUi(this);
 
-        }
-
-        public virtual void Update(float fDeltaTime)
-        {
-        }
-
-        protected void AddNeedResources(string strPath, UiResourceType eType, bool bIsFromResources = true)
-        {
-            if (LtNeedResources.Any(t => t.StrResourcePath == strPath))
-                return;
-
-            UiResourcesInfo info = new UiResourcesInfo
+            if (mDesigner != null)
             {
-                StrResourcePath = strPath,
-                EType = eType,
-                BIsFromResources = bIsFromResources
-            };
-
-            LtNeedResources.Add(info);
-        }
-
-        public void DoOpen()
-        {
-            #region ---解析传入参数 暂时支持两个int类型
-
-            int nPara1 = 0;
-            int nPara2 = 0;
-            if (Paras != null)
-            {
-                if (Paras.Length >= 1)
-                {
-                    if (Paras[0] is int)
-                    {
-                        nPara1 = (int) Paras[0];
-                    }
-                }
-
-                if (Paras.Length >= 2)
-                {
-                    if (Paras[1] is int)
-                    {
-                        nPara2 = (int) Paras[1];
-                    }
-                }
+                mDesigner.Release();
+                mDesigner = null;
             }
+        }
 
-            AnalysParas(nPara1, nPara2);
-
-            #endregion
-
+        protected internal void DoOpen()
+        {
             _beforeOpen = false;
-            _mBShowing = true;
+            
+            IsShowing = true;
 
-            //MessageDispatcher.Instance.DispatchMessage(EDispatchMsg.UiOpen, Bind);
-            foreach (var res in LtNeedResources.Where(res => res.ResObj == null))
+            ResourcesManager.Instance.LoadResource(mainPath, HandleUiResourceOk);
+        }
+
+        private void HandleUiResourceOk(string path, Object obj)
+        {
+            if (!IsShowing) return;
+
+            if (obj != null)
             {
-                res.BNeedLoad = true;
-                ResourcesManager.Instance.LoadResource(res.StrResourcePath, OnLoaded);
+                GameObject mainObj = Object.Instantiate(obj,GameManager.Instance.Ui2DTransform) as GameObject;
+
+                if (mainObj)
+                {
+                    mDesigner = mainObj.GetComponent<UiDesignerBase>();
+
+                    if (mDesigner == null)
+                    {
+                        Debug.LogError("cant find designer component : " + obj.name);
+                        return;
+                    }
+                    else
+                    {
+                        InitLogic();
+
+                        mDesigner.SetLogic(this);
+
+                        mDesigner.Init();
+                        //延迟一帧，当ui真正绘制出来以后，在调用ShowFinished 这样一些坐标转换，和一些UI操作才不会出错
+                        //UI的显示操作都应该放在ShowFinished中去做，而不应该在Init中去做 
+
+                        //TODO 
+                        mDesigner.ShowFinished();
+                    }
+                }
+                else
+                {
+                    //加载窗口失败，返回初始化失败
+                    Close();
+                    Debug.LogError("加载窗口失败！path = " + path);
+                }
             }
         }
 
-        public virtual EUiForType UiType()
+        //注册游戏逻辑的委托事件
+        protected virtual void InitLogic()
         {
-            return EUiForType.UiNone;
-        }
-
-        private void OnLoaded(string path, Object obj)
-        {
-            var item = LtNeedResources.Find(uiResourcesInfo => uiResourcesInfo.StrResourcePath == path);
-            item.ResObj = obj;
+            
         }
     }
 }
