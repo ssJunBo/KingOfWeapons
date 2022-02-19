@@ -1,4 +1,6 @@
-﻿using bFrame.Game.ResourceFrame;
+﻿using System.Threading;
+using bFrame.Game.ResourceFrame;
+using bFrame.Game.Tools;
 using MVC.Controller;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -7,81 +9,85 @@ namespace bFrame.Game.UIFrame.Base
 {
     public class UiLogicBase
     {
-        private bool IsShowing;
+        private bool _isShowing;
 
         private bool _beforeOpen;
 
-        protected UiDesignerBase mDesigner;
+        private UiDesignerBase _mDesigner;
 
-        private Vector3 _vector3 = new Vector3(-9999, -9999, -9999);
-
-        private string mainPath;
+        private string _mainPath;
 
         protected void SetPath(string path)
         {
-            mainPath = path;
+            _mainPath = path;
         }
+
         //实际打开
         public virtual void Open()
         {
-            if (IsShowing || _beforeOpen)
+            if (_isShowing || _beforeOpen)
                 return;
 
             _beforeOpen = true;
-            
+
             UiLogicManager.Instance.AddUi(this);
         }
-        
+
 
         public virtual void Close()
         {
             UiLogicManager.Instance.RemoveUi(this);
 
-            if (mDesigner != null)
+            if (_mDesigner != null)
             {
-                mDesigner.Release();
-                mDesigner = null;
+                _mDesigner.Release();
+                _mDesigner = null;
             }
         }
 
         protected internal void DoOpen()
         {
             _beforeOpen = false;
-            
-            IsShowing = true;
 
-            ResourcesManager.Instance.LoadResource(mainPath, HandleUiResourceOk);
+            _isShowing = true;
+
+            ResourcesManager.Instance.LoadResource(_mainPath, HandleUiResourceOk);
         }
 
         private void HandleUiResourceOk(string path, Object obj)
         {
-            if (!IsShowing) return;
+            if (!_isShowing) return;
 
             if (obj != null)
             {
-                GameObject mainObj = Object.Instantiate(obj,GameManager.Instance.Ui2DTransform) as GameObject;
+                GameObject mainObj = Object.Instantiate(obj, GameManager.Instance.Ui2DTransform) as GameObject;
 
-                if (mainObj)
+                if (mainObj!=null)
                 {
-                    mDesigner = mainObj.GetComponent<UiDesignerBase>();
+                    _mDesigner = mainObj.GetComponent<UiDesignerBase>();
 
-                    if (mDesigner == null)
+                    if (_mDesigner == null)
                     {
                         Debug.LogError("cant find designer component : " + obj.name);
-                        return;
                     }
                     else
                     {
                         InitLogic();
 
-                        mDesigner.SetLogic(this);
+                        _mDesigner.SetLogic(this);
 
-                        mDesigner.Init();
+                        _mDesigner.Init();
+                        Debug.LogError("前 "+CTools.TickCount());
                         //延迟一帧，当ui真正绘制出来以后，在调用ShowFinished 这样一些坐标转换，和一些UI操作才不会出错
                         //UI的显示操作都应该放在ShowFinished中去做，而不应该在Init中去做 
-
+                        TimeCallback.Instance.DelayHowManySecondsAfterCallBack(1, () =>
+                        {
+                            _mDesigner.ShowFinished();
+                            Debug.LogError("后 " + CTools.TickCount());
+                        });
+                        
                         //TODO 
-                        mDesigner.ShowFinished();
+                        _mDesigner.ShowFinished();
                     }
                 }
                 else
@@ -96,7 +102,7 @@ namespace bFrame.Game.UIFrame.Base
         //注册游戏逻辑的委托事件
         protected virtual void InitLogic()
         {
-            
+
         }
     }
 }

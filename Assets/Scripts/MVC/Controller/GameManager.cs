@@ -1,4 +1,7 @@
-﻿using bFrame.Game.ResourceFrame;
+﻿using System;
+using bFrame.Game.Base;
+using bFrame.Game.ResourceFrame;
+using bFrame.Game.Tools;
 using MVC.Model;
 using UnityEngine;
 
@@ -8,7 +11,8 @@ namespace MVC.Controller
     {
         [SerializeField] private bool loadFromAssetBundle;
 
-        [Header("普通 Designer 放在此节点下"),Space]public Transform Ui2DTransform;
+        [Header("普通 Designer 放在此节点下"),Space]
+        public Transform Ui2DTransform;
 
         [Header("对象池回收节点"),Space]
         public Transform RecyclePoolTrs;
@@ -33,16 +37,15 @@ namespace MVC.Controller
         protected override void Awake()
         {
             base.Awake();
-           
-            DontDestroyOnLoad(gameObject);
             
+            DontDestroyOnLoad(gameObject);
+
             InitManager();
 
             //从ab包加载就要先加载配置表
 //            ResourceManager.Instance.MLoadFromAssetBundle = loadFromAssetBundle;
 //            if (ResourceManager.Instance.MLoadFromAssetBundle)
 //                AssetBundleManager.Instance.LoadAssetBundleConfig();
-        
         }
 
         private void Start()
@@ -51,7 +54,15 @@ namespace MVC.Controller
 
             MoudlePlay.UiStartWndLogic.Open();
         }
-        
+
+        private void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                Debug.LogError(CTools.TickCount());
+            }
+        }
+
         private void InitManager()
         {
           

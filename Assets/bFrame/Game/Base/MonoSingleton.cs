@@ -1,26 +1,22 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-public class MonoSingleton<T> : MonoBehaviour where T : MonoSingleton<T>
+namespace bFrame.Game.Base
 {
-
-    protected static T instance;
-
-    public static T Instance
+    public abstract class MonoSingleton<T> : MonoBehaviour where T : MonoSingleton<T>
     {
-        get { return instance; }
-    }
+        public static T Instance;
 
-    protected virtual void Awake()
-    {
-        if (instance == null)
+        protected virtual void Awake()
         {
-            instance = (T)this;
+            if (Instance == null)
+            {
+                Instance = (T) this;
+            }
+            else
+            {
+                Debug.LogError("Get a second instance of this class :" + this.GetType());
+            }
         }
-        else
-        {
-            Debug.LogError("Get a second instance of this class :" + this.GetType());
-        }
+        
     }
 }

@@ -42,6 +42,10 @@
               <e p="Resource.asmdef" t="Include" />
               <e p="ResourcesManager.cs" t="Include" />
             </e>
+            <e p="Tools" t="Include">
+              <e p="CTools.cs" t="Include" />
+              <e p="TimeCallback.cs" t="Include" />
+            </e>
             <e p="UIFrame" t="Include">
               <e p="AudioManager.cs" t="Include" />
               <e p="Base" t="Include">

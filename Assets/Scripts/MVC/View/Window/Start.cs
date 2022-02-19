@@ -1,10 +1,6 @@
-﻿using bFrame.Game.Base;
-using bFrame.Game.UIFrame;
-using bFrame.Game.UIFrame.Base;
+﻿using bFrame.Game.UIFrame.Base;
 using MVC.Controller;
-using MVC.Model;
 using MVC.Model.UiLogic;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
